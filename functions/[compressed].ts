@@ -24,16 +24,21 @@ const base64DecoderStream = () => new TransformStream<string,Uint8Array>({
 
 
 export const onRequestGet: PagesFunction<{}> = async (context) => {
-  const encoded = context.functionPath.slice(1)
-
-  const decompressedReadableStream = toReadableStream(encoded)
-      .pipeThrough(uriDecoderStream())
-      .pipeThrough(base64DecoderStream())
-      .pipeThrough(new DecompressionStream('gzip'))
-
-
-  return new Response(decompressedReadableStream, { headers: {
-    'Content-Type': 'application/json;charset=utf-8'
-  }});
+  try {
+    const encoded = context.functionPath.slice(1)
+  
+    const decompressedReadableStream = toReadableStream(encoded)
+        .pipeThrough(uriDecoderStream())
+        .pipeThrough(base64DecoderStream())
+        .pipeThrough(new DecompressionStream('gzip'))
+  
+  
+    return new Response(decompressedReadableStream, { headers: {
+      'Content-Type': 'application/json;charset=utf-8'
+    }});
+  } catch (err) {
+    console.error(err)
+    return new Response(err.message, { status: 500 });
+  }
 
 }
