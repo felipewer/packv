@@ -30,7 +30,7 @@ export const onRequestGet: PagesFunction<{}> = async (context) => {
     const decompressedReadableStream = toReadableStream(encoded)
         .pipeThrough(uriDecoderStream())
         .pipeThrough(base64DecoderStream())
-        .pipeThrough(new DecompressionStream('gzip'))
+        // .pipeThrough(new DecompressionStream('gzip'))
   
   
     return new Response(decompressedReadableStream, { headers: {

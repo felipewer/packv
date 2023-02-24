@@ -19,7 +19,7 @@ export const onRequestPost: PagesFunction<{}> = async (context) => {
   try {
 
     const transformedStream = context.request.body
-      .pipeThrough(new CompressionStream("gzip"))
+      // .pipeThrough(new CompressionStream("gzip"))
       .pipeThrough(base64EncoderStream())
       .pipeThrough(uriEncoderStream())
       .pipeThrough(new TextEncoderStream())
