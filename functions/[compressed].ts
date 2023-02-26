@@ -1,39 +1,11 @@
-import { base64DecToArr } from '../lib/base64-util'
-
-
-const toReadableStream = (input: string) => new ReadableStream<string>({
-  start(controller) {
-    controller.enqueue(input)
-    controller.close()
-  }
-});
-
-
-const uriDecoderStream = () => new TransformStream<string,string>({
-  transform(chunk, controller) {
-    controller.enqueue(decodeURIComponent(chunk))
-  }
-})
-
-
-const base64DecoderStream = () => new TransformStream<string,Uint8Array>({
-  transform(chunk, controller) {
-    controller.enqueue(base64DecToArr(chunk))
-  }
-})
-
+import * as LZString from 'lz-string'
 
 export const onRequestGet: PagesFunction<{}> = async (context) => {
   try {
     const encoded = context.functionPath.slice(1)
+    const decoded = LZString.decompressFromEncodedURIComponent(encoded)
   
-    const decompressedReadableStream = toReadableStream(encoded)
-        .pipeThrough(uriDecoderStream())
-        .pipeThrough(base64DecoderStream())
-        // .pipeThrough(new DecompressionStream('gzip'))
-  
-  
-    return new Response(decompressedReadableStream, { headers: {
+    return new Response(decoded, { headers: {
       'Content-Type': 'application/json;charset=utf-8'
     }});
   } catch (err) {
