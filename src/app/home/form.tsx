@@ -1,5 +1,6 @@
-import type { Component } from 'solid-js'
-import { createSignal } from 'solid-js'
+"use client"
+
+import { ChangeEvent, FormEvent, useState } from 'react'
 
 const postData = async (data: Record<string,unknown>) => {
   const resp = await fetch('/', { 
@@ -14,21 +15,19 @@ const postData = async (data: Record<string,unknown>) => {
   return resp.text()
 }
 
-const App: Component = () => {
-  const [content,setContent] = createSignal('')
+export default function Form() {
+  const [content,setContent] = useState<string>('')
 
-  const validContent = () => !!content()
-
-  const handleFormChange = event => {
+  const handleFormChange = (event: ChangeEvent<HTMLInputElement>) => {
     setContent(event.currentTarget.value)
   }
 
-  const submit = async event => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
-      const compressed = await postData({content: 'test'})
+      const compressed = await postData({content})
       alert(compressed)
-    } catch (err) {
+    } catch (err: any) {
       console.error(err.message)
     }
     setContent('')
@@ -36,12 +35,13 @@ const App: Component = () => {
 
   return (
     <form onSubmit={submit}>
-      <div class="input">
-        <label for="name">Content</label>
-        <input id="name" name="name" value={content()} type="text" onChange={handleFormChange} />
+      <div className="input">
+        <label>Content
+          <input id="name" name="name" value={content} type="text" onChange={handleFormChange} />
+        </label>
       </div>
 
-      {/* <div class="input">
+      {/* <div className="input">
         <label for="content-type">Content Type?</label>
         <select id="content-type" name="content-type">
           <option value="application/json;charset=utf-8">JSON</option>
@@ -50,9 +50,7 @@ const App: Component = () => {
         </select>
       </div> */}
 
-      <button type="submit" disabled={!validContent()}>Store</button>
+      <button type="submit" disabled={!content}>Store</button>
     </form>
-  );
-};
-
-export default App;
+  )
+}
