@@ -23,3 +23,5 @@ export async function POST(request: Request) {
     return new Response(err.message, { status: 500 });
   }
 }
+
+export const runtime = 'experimental-edge'
