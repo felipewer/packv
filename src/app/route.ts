@@ -1,10 +1,4 @@
-import { redirect } from 'next/navigation'
 import * as LZString from 'lz-string'
-
-
-export async function GET() {
-  redirect('/home')
-}
 
 
 export async function POST(request: Request) {
@@ -23,3 +17,5 @@ export async function POST(request: Request) {
     return new Response(err.message, { status: 500 });
   }
 }
+
+export const runtime = 'edge'
