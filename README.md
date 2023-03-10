@@ -45,4 +45,4 @@ A simple service to compress and encode small text files into self contained url
 
 ### Ops
 
-- Attach short custom domain to service (packv.ws)
+- [x] Attach short custom domain to service (packv.ws)
