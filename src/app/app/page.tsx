@@ -13,7 +13,13 @@ const postData = async (payload: Payload) => {
   })
   if (!resp.ok) throw Error(await resp.text())
 
-  return resp.text()
+  const location = resp.headers.get('Location')
+
+  if (!location) {
+    throw new Error('Missing Location header')
+  }
+
+  return location
 }
 
 

@@ -1,16 +1,22 @@
-import * as LZString from 'lz-string'
+import { getInstance } from "@/lib/packer"
 
+const VERSION = 1
 
 export async function POST(request: Request) {
   try {
+    const packer = getInstance(VERSION)
+
+    const contentType = request.headers.get('Content-Type') || 'text/plain'
+    const contentTypeId = packer.mapContentTypeToId(contentType)
 
     const input = await request.text()
-    const encoded = LZString.compressToEncodedURIComponent(input)
+    const encoded = packer.encode(input)
 
-    return new Response(
-      encoded, 
-      { headers: {'Content-Type':'text/plain'} }
-    )
+    const location = `${request.url}${VERSION}/${contentTypeId}/${encoded}`
+    return new Response(null,{
+      status: 201,
+      headers: { 'Location': location }
+    })
 
   } catch (err: any) {
     console.error(err)
