@@ -1,5 +1,5 @@
 "use client"
-import { FormEvent, useState } from 'react'
+import { FormEvent, MouseEvent, useState } from 'react'
 
 
 export type Payload = {
@@ -16,6 +16,14 @@ type FormStatus = {
   message?: string
 }
 
+
+const copyLocationToClipboard = (location: string) => 
+  (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    navigator.clipboard.writeText(location)
+  }
+
+
 const errorSection = (formStatus: FormStatus) => (
   <section>
     <details>
@@ -25,17 +33,19 @@ const errorSection = (formStatus: FormStatus) => (
   </section>
 )
 
+
 const successSection = (formStatus: FormStatus) => (
   <section>
     <details open>
       <summary>Content stored successfully</summary>
       <p>
         <a href={formStatus.message} target='_blank'>{formStatus.message}</a>
-        <button>Copy</button>
+        <button onClick={copyLocationToClipboard(formStatus.message || '')} >Copy</button>
       </p>
     </details>
   </section>
 )
+
 
 export default function ContentForm({onFormSubmit}: Props) {
   const [formStatus, setFormStatus] = useState<FormStatus>({status: 'FRESH'})
@@ -91,7 +101,7 @@ export default function ContentForm({onFormSubmit}: Props) {
         <button type="submit">Store</button>
       </form>
       {(formStatus.status === 'FRESH')
-        ? <section><p></p></section>
+        ? <section className='hidden'><p></p></section>
         : (formStatus.status === 'SUCCESS')
         ? successSection(formStatus)
         : errorSection(formStatus)
