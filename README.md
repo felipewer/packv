@@ -1,6 +1,6 @@
 # url-store
 
-A simple service to compress and encode small text files into self contained urls.
+A compressed key value store for **small** textual content. Post content to have it compressed and encoded into a url. Access the url to retrieve the original value.
 
 
 ## Roadmap
@@ -8,34 +8,34 @@ A simple service to compress and encode small text files into self contained url
 
 ### UI
 
-- Add title and short description section
+- [x] Add title and short description section
 
-- Add and style text input field
+- [x] Add text input field
 
-- Add content-type field (default to text/plain)
+- [x] Add content-type field (default to text/plain)
 
-- Add link output field
+- [x] Add link output field
 
-- Add Copy (to clipboard) button
+- [x] Add Copy (to clipboard) button
 
 ### API
 
-- Return full link
-  - Parameterize base url with ENV variable
+- [x] Return full link
+  - Extract basePath from request url
 
-- Add url section with code for implementation version
+- [x] Add url section with code for implementation version
   - Extract implementation into own module, outside http handler
 
-- Add url section with code for content-type
+- [x] Add url section with code for content-type
   - Return correct content type header based on url parameter
+
+- [x] Add input content type check (If not in white-list assume text/plain)
 
 - Add unit tests for compression + encoding / decoding + decompression
 
 - Add proper error handling
 
 - Add input size check
-
-- Add input content type check (If not in white-list assume text/plain)
 
 - Add maxed out caching headers to GET response (Enable only in production, maybe use a middleware)
 
