@@ -1,5 +1,6 @@
 "use client"
-import { FormEvent, MouseEvent, useState } from 'react'
+import { FormEvent } from 'react'
+import { Outcome } from '@/app/app/outcome.type'
 
 
 export type Payload = {
@@ -7,70 +8,50 @@ export type Payload = {
   content: string
 }
 
+
 type Props = {
-  onFormSubmit: (payload: Payload) => Promise<string>
-}
-
-type FormStatus = {
-  status: 'FRESH' | 'SUCCESS' | 'ERROR'
-  message?: string
+  onSubmitOutcome: (outcome: Outcome) => void
 }
 
 
-const copyLocationToClipboard = (location: string) => 
-  (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    navigator.clipboard.writeText(location)
+
+const postData = async ({ content, contentType }: Payload) => {
+  const resp = await fetch('/', { 
+    method: 'POST',
+    body: content,
+    headers: {
+      'Content-Type': contentType
+    }
+  })
+  if (!resp.ok) throw Error(await resp.text())
+
+  const location = resp.headers.get('Location')
+
+  if (!location) {
+    throw new Error('Missing Location header')
   }
 
-
-const errorSection = (formStatus: FormStatus) => (
-  <section>
-    <details>
-      <summary>Content could not be stored</summary>
-      <p>{formStatus.message}</p>
-    </details>
-  </section>
-)
+  return location
+}
 
 
-const successSection = (formStatus: FormStatus) => (
-  <section>
-    <details open>
-      <summary>Content stored successfully</summary>
-      <p>
-        <a href={formStatus.message} target='_blank'>{formStatus.message}</a>
-        <button onClick={copyLocationToClipboard(formStatus.message || '')} >Copy</button>
-      </p>
-    </details>
-  </section>
-)
-
-
-export default function ContentForm({onFormSubmit}: Props) {
-  const [formStatus, setFormStatus] = useState<FormStatus>({status: 'FRESH'})
+export default function ContentForm({ onSubmitOutcome }: Props) {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
     const form = event.currentTarget
     const formData = new FormData(form)
     const payload = Object.fromEntries(formData.entries()) as Payload
 
     try {
-      const result = await onFormSubmit(payload)
+      const url = await postData(payload)
       form.reset()
-      setFormStatus({
-        status: 'SUCCESS',
-        message: result
-      })
+      onSubmitOutcome(url)
     } catch (err: any) {
-      setFormStatus({
-        status: 'ERROR',
-        message: err.message
-      })
+      onSubmitOutcome(err as Error)
     }
   }
-
 
   return (
     <>
@@ -100,12 +81,6 @@ export default function ContentForm({onFormSubmit}: Props) {
         </p>
         <button type="submit">Store</button>
       </form>
-      {(formStatus.status === 'FRESH')
-        ? <section className='hidden'><p></p></section>
-        : (formStatus.status === 'SUCCESS')
-        ? successSection(formStatus)
-        : errorSection(formStatus)
-      }
     </>
   )
 }

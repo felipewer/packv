@@ -1,49 +1,40 @@
 'use client'
-import { useEffect, useState } from 'react'
-import ContentForm, { type Payload } from '@/app/app/content-form'
-import HistoryList from '@/app/app/history-list'
+import { useEffect, useState } from "react"
 
-const postData = async (payload: Payload) => {
-  const resp = await fetch('/', { 
-    method: 'POST',
-    body: payload.content,
-    headers: {
-      'Content-Type': payload.contentType
-    }
-  })
-  if (!resp.ok) throw Error(await resp.text())
+import ContentForm from '@/app/app/content-form'
+import HistoryList, { type URLTuple } from '@/app/app/history-list'
+import type { Outcome } from '@/app/app/outcome.type'
+import OutcomeDetails from '@/app/app/outcome-details'
 
-  const location = resp.headers.get('Location')
-
-  if (!location) {
-    throw new Error('Missing Location header')
-  }
-
-  return location
+type PageState = {
+  lastSubmission: Outcome | null;
+  history: URLTuple[];
 }
 
-
-type URLTuple = [timestamp: string, url: string]
-
 export default function Home() {
-  const [storedURLs, setStoredURLs] = useState<URLTuple[]>([])
-
+  const [state, setState] = useState<PageState>({
+    lastSubmission: null, 
+    history: []
+  });
 
   useEffect(() => {
-    const sessionUrls = Object.entries(sessionStorage)
+    const tuples = Object.entries(localStorage)
       .sort(([tmtA],[tmtB]) => parseInt(tmtB) - parseInt(tmtA))
-    setStoredURLs(sessionUrls)
+    setState(prev => ({...prev, history: tuples}))
   },[])
-  
 
-  const handleFormSubmit = async (payload: Payload) => {
-    const url = await postData(payload)
-    const timestamp = `${(new Date()).getTime()}`
-    setStoredURLs(prev => ([[timestamp, url], ...prev]))
-    sessionStorage.setItem(timestamp,url)
-    return url
+  const onSubmitOutcome = (outcome: Outcome) => {
+    if (outcome instanceof Error) {
+      setState(prev => ({...prev, lastSubmission: outcome}))
+    } else {
+      const timestamp = `${(new Date()).getTime()}`
+      setState(prev => ({
+        history: [ [timestamp,outcome], ...prev.history ],
+        lastSubmission: outcome
+      }))
+      localStorage.setItem(timestamp,outcome)
+    }
   }
-
 
   return (
     <main>
@@ -55,11 +46,16 @@ export default function Home() {
       </hgroup>
       <section>
         <h2>Store content</h2>
-        <ContentForm onFormSubmit={handleFormSubmit}/>
+        <ContentForm onSubmitOutcome={onSubmitOutcome}/>
+        <section style={!state.lastSubmission ? {visibility: 'hidden'} : {}}>
+          {state.lastSubmission && 
+            <OutcomeDetails outcome={state.lastSubmission}/>
+          }
+        </section>
       </section>
       <section>
         <h2>Stored Content Urls</h2>
-        <HistoryList storedURLs={storedURLs} />
+        <HistoryList list={state.history}/>
       </section>
     </main>
   )

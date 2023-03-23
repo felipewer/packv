@@ -1,13 +1,14 @@
+export type URLTuple = [timestamp: string, url: string]
 
 type Props = {
-  storedURLs: [timestamp: string,url: string][]
+  list: URLTuple[]
 }
 
-export default function HistoryList({storedURLs}: Props){
+export default function HistoryList({list}: Props){
   return (
     <dl>
-      {storedURLs.map(([timestamp,url],key) => (
-        <div key={key}>
+      {list.map(([timestamp,url]) => (
+        <div key={timestamp}>
           <dt>{(new Date(parseInt(timestamp))).toString()}</dt>
           <dd><a href={url} target='_blank'>{url}</a></dd>
         </div>
