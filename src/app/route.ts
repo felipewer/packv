@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const input = await request.text()
     const encoded = packer.encode(input)
 
-    const location = `${request.url}${VERSION}/${contentTypeId}/${encoded}`
+    const location = `${request.url}${VERSION}/${encoded}?t=${contentTypeId}`
     return new Response(null,{
       status: 201,
       headers: { 'Location': location }

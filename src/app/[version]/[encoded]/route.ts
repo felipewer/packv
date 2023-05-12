@@ -14,7 +14,8 @@ export async function OPTIONS() {
 
 export async function GET(req: NextRequest) {
   try {
-    const [,version, contentTypeId, encoded] = req.nextUrl.pathname.split('/')
+    const [,version, encoded] = req.nextUrl.pathname.split('/')
+    const contentTypeId = req.nextUrl.searchParams.get('t') || '0'
     
     const packer = getInstance(parseInt(version))
     const contentType = packer.mapIdToContentType(contentTypeId)

@@ -19,6 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     const tuples = Object.entries(localStorage)
+      .filter(([key]) => key.startsWith('packv:'))
       .sort(([tmtA],[tmtB]) => parseInt(tmtB) - parseInt(tmtA))
     setState(prev => ({...prev, history: tuples}))
   },[])
@@ -32,7 +33,7 @@ export default function Home() {
         history: [ [timestamp,outcome], ...prev.history ],
         lastSubmission: outcome
       }))
-      localStorage.setItem(timestamp,outcome)
+      localStorage.setItem(`packv:${timestamp}`,outcome)
     }
   }
 
