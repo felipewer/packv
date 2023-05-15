@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
 import { getInstance } from '@/lib/packer';
 
+export const runtime = 'edge';
+
 
 export async function OPTIONS() {
   return new Response(null,{

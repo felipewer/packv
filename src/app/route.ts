@@ -1,5 +1,7 @@
 import { getInstance } from "@/lib/packer"
 
+export const runtime = 'edge';
+
 const VERSION = 1
 
 export async function POST(request: Request) {
