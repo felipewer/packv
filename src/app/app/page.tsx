@@ -20,6 +20,7 @@ export default function Home() {
   useEffect(() => {
     const tuples = Object.entries(localStorage)
       .filter(([key]) => key.startsWith('packv:'))
+      .map(([key,value]) => [key.replace('packv:',''),value] as URLTuple)
       .sort(([tmtA],[tmtB]) => parseInt(tmtB) - parseInt(tmtA))
     setState(prev => ({...prev, history: tuples}))
   },[])
