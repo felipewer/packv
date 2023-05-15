@@ -4,6 +4,17 @@ export const runtime = 'edge';
 
 const VERSION = 1
 
+
+export async function OPTIONS() {
+  return new Response(null,{
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods':'POST,OPTIONS'
+    }
+  })
+}
+
+
 export async function POST(request: Request) {
   try {
     const packer = getInstance(VERSION)
@@ -15,9 +26,9 @@ export async function POST(request: Request) {
     const encoded = packer.encode(input)
 
     const location = `${request.url}${VERSION}/${encoded}?t=${contentTypeId}`
-    return new Response(null,{
+    return new Response(location,{
       status: 201,
-      headers: { 'Location': location }
+      headers: { 'Location': location },
     })
 
   } catch (err: any) {
